@@ -164,7 +164,3 @@ Right now, we have two queues:
    It turn out, the microTask Queue has higher piority than the callback queue, which means the event loop will ALWAYS check if the microTask queue is ready to push to the call stack before the callback queue.
 
 So, now, the call stack is empty, and the `display("hi")` gets to run first, and after this, the microTask queue is also empty, the `printHello()` gets executed.
-
-**What kind of stuff can be put into the microTask queue?**
-
-Things that not immediately returned from the web browser, such as promise.
