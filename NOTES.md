@@ -221,3 +221,40 @@ When `returnNextElem` executed, it looks for the `arr` and `i` in its local exec
 Each time we call `returnNextElem`, we gets back the next element of the `arr`.
 
 Any function like the above one, when gets called each time it gives me the next flow of data is called iterator.
+
+# 4. Generator
+
+Generator creates the flow of data like we did earlier, each time we call `next`, we will get the next piece of the data
+
+```js
+function* createFlow() {
+  yield 3;
+  yield 4;
+  yield 5;
+}
+
+const flow = createFlow();
+flow.next(); // { value: 3, done: false }
+flow.next(); // { value: 4, done: false }
+flow.next(); // { value: 5, done: false }
+flow.next(); // { value: undefined, done: true }
+```
+
+Let's build a generator liked function
+
+```js
+function gen(values) {
+  let i = 0;
+  let ret;
+
+  return {
+    next: function() {
+      ret = {
+        value: values[i],
+        done: i < values.length
+      };
+      return ret;
+    }
+  };
+}
+```
