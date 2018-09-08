@@ -164,3 +164,60 @@ Right now, we have two queues:
    It turn out, the microTask Queue has higher piority than the callback queue, which means the event loop will ALWAYS check if the microTask queue is ready to push to the call stack before the callback queue.
 
 So, now, the call stack is empty, and the `display("hi")` gets to run first, and after this, the microTask queue is also empty, the `printHello()` gets executed.
+
+# 3. Iterators
+
+We regularly have lists or collections or data when we want to go through each one of them and do some stuff to the element
+
+```js
+const numbers = [2, 4, 6, 1, 9];
+
+for (let i = 0; i < numbers.length; i += 1) {
+  console.log(numbers[i]);
+}
+```
+
+The above implementation is hard to reason because we have to keep tracking on `i` as well as the current `number[i]`.
+
+## 3.1 Function returns a function
+
+```js
+function createFn() {
+  // 1
+  function add2(num) {
+    return num + 2;
+  }
+  return add2;
+}
+
+const newFn = createFn(); // 2
+const result = newFn(4); // 3
+```
+
+1: register `createFn` on memory (global execution context).
+2: call the `createFn` and get the result of the reference in memory of `add2` (not the add2 itself), and store the value on `newFn`
+3: call the `newFn` with 4 and store the value on `result`
+
+## 3.2 Return next element with a function
+
+```js
+function createFn(arr) {
+  let i = 0;
+  function inner() {
+    const elem = arr[i];
+    i += 1;
+    return elem;
+  }
+  return inner;
+}
+
+const returnNextElem = createFn([1, 2, 3, 4]);
+```
+
+It turned out, if we return a function from a function, it not just return the function itself, it also return the data inside the execution context with the function.
+
+When `returnNextElem` executed, it looks for the `arr` and `i` in its local execution context, but it doesn't found them, next, it will start to look at the execution context returned with the function, not the global execution context.
+
+Each time we call `returnNextElem`, we gets back the next element of the `arr`.
+
+Any function like the above one, when gets called each time it gives me the next flow of data is called iterator.
