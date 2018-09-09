@@ -258,3 +258,52 @@ function gen(values) {
   };
 }
 ```
+
+## 5.1 Generator work through
+
+We can also dynamically set what data flows to us
+
+```js
+// a
+function* createFlow() {
+  const num = 10; // a1
+  const newNum = yield num; // a2
+  yield 5 + num; // a3
+  yield 6; // a4
+}
+
+const nextElem = createFlow(); // b
+const elem1 = nextElem.next(); // 10 // c
+const elem2 = nextElem.next(2); // 7 // d
+const elem3 = nextElem.next(); // 6 // e
+```
+
+What happened with the above code?
+
+**for simplicity reason, we just pretend the return of generator is just the value not the object with value and done**
+
+a: declear a generator function in memory called create flow
+
+b: store the returned value of `createFlow`, something like `{ next: fn }`, into `nextElem`
+
+c: declear `elem1`, set its value of `nextElem.next()` call, notice here, the call is different to other function calls, it opens the `createFlow`'s execution context, which bring us back to a1.
+
+a1: creates an variable num and assign 10 to it
+
+a2: `yield` is a special keyword, it works like `return`, but it will kind of pause the execution context of `createFlow`, and it will throw the value 10 to line c, and at this time, `newNum` is undefined, it is waiting for the value come back from the outside call, and it hand over the control to line c.
+
+c: it takes 10 and assign it to `elem1`, and it will continuesly run line d.
+
+d: declear `elem2` and call `nextElem.next` with 2, now, it re-open the `createFlow`'s execution context, and it takes us back to line a2
+
+a2: replace the `yield num` with value 2, and now, `newNum` will be assigned with 2
+
+a3: throw the value of `5 + 2` to the line d.
+
+d: get back 7 from the `nextElem.next(2)` call, and store it to vairable elem2.
+
+e: delear another variable `elem3` and call `nextElem.next`, the call, again, will take us back to the `createFlow`'s execution context, and fires line a4
+
+a4: throw 6 to the line e
+
+e: get back 6 from `nextElem.next` call, and store it into variable `elem3`.
