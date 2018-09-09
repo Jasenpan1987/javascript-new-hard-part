@@ -307,3 +307,54 @@ e: delear another variable `elem3` and call `nextElem.next`, the call, again, wi
 a4: throw 6 to the line e
 
 e: get back 6 from `nextElem.next` call, and store it into variable `elem3`.
+
+## 5.2 Async Generator
+
+```js
+// 1
+function doWhenDataReceived(value) {
+  // c
+  returnNextElem.next(value);
+}
+
+// 2
+function* createFlow() {
+  // a
+  const data = yield fetch("http://twitter.com/jasen/tweets/1");
+  // b
+  console.log(data);
+}
+
+// 3
+const returnNextElem = createFlow();
+// 4
+const futureData = returnNextElement.next();
+// 5
+futureData.then(doWhenDataReceived);
+```
+
+What does it do when execute?
+
+1: declear a function in memory called `doWhenDataReceived`
+
+2: declear a generator function called `createFlow`
+
+3: declear `returnNextElem` which value is the return value of the `createFlow` call (`{ next: fn }`)
+
+4: declear `futureData` which is the output of the `returnNextElem.next`'s call, enters the `createFlow`'s context at a
+
+a: declear `data` and give it undefined, and at the same time, the `fetch` fires, which is a facade function, does two things: fires the xhr from the browser and returns back a promise object. And the promise object will be thrown back to line 4.
+
+4: now the `futureData` becomes to an promise object (`{ value: undefined, onFullfilled: [] }`).
+
+5: add `doWhenDataReceived` to the `futureData`'s `onFullfilment` array.
+
+_after twitter gives us back the data "hi":_
+
+5: the `futureData.value` gets update with "hi", and it the `doWhenDataReceived` goes into the microTask queue, since here we don't have any calls on the call stack, `doWhenDataReceived` will be pushed into the call stack and executed with the string "hi" as the argument
+
+c: it creates an execution context, and it calls the `returnNextElem.next` with the value "hi" and it takes us back to a
+
+a: `data` will be assigned with the value "hi"
+
+b: console.log the data which is "hi"
